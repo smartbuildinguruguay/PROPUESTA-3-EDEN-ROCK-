@@ -618,6 +618,13 @@ const PLANOS_B64 = {
             // relación H/H_WORST de la combinación elegida, y redondeada a equipos de 18.000 BTU.
             N_DORM: 4, DORM_BTU: 9000, LIVING_BASE_BTU: 54000, UNIT_BTU: 18000,
             TARIFA_UYU_KWH: 8.452, HDD: 1400, CDD: 500, COP: 3.0,
+            // Potencia eléctrica: kW por BTU según tabla oficial UTE (12.000 BTU ≈ 1,5 kW → 0,000125 kW/BTU),
+            // más carga fija estimada del resto de la vivienda (bomba sumergible pozo 33m + presurizadora del
+            // sistema de agua, termotanque, horno eléctrico, lavarropas, secarropas, heladera, iluminación).
+            // UTE permite monofásico hasta 11,5 kW — por encima, corresponde trifásico (arranca en 6 kW).
+            KW_POR_BTU: 0.000125,
+            POT_FIJA_KW: 7.65,
+            POT_MONOFASICO_MAX: 11.5,
         };
         function calcClimatizacion() {
             const h = calcHTermico();
@@ -635,7 +642,9 @@ const PLANOS_B64 = {
             const costUYUWorst = kwhYearWorst * TERM.TARIFA_UYU_KWH;
             const savingsUYU = costUYUWorst - costUYU;
             const savingsUSD = savingsUYU / TC;
-            return { totalBTU, livingBTU, livingUnits, dormBTU, totalUnits, kwhYear, costUYU, costUSD, savingsUYU, savingsUSD };
+            const potenciaKW = (totalBTU * TERM.KW_POR_BTU) + TERM.POT_FIJA_KW;
+            const necesitaTrifasica = potenciaKW > TERM.POT_MONOFASICO_MAX;
+            return { totalBTU, livingBTU, livingUnits, dormBTU, totalUnits, kwhYear, costUYU, costUSD, savingsUYU, savingsUSD, potenciaKW, necesitaTrifasica };
         }
         function calcHTermico() {
             const uRoof = TERM.U_ROOF[state.sist] ?? TERM.U_ROOF.iso;
@@ -686,6 +695,13 @@ const PLANOS_B64 = {
                         <div class="flex justify-between text-xs"><span class="text-slate-500">Living / comedor / cocina</span><span class="font-mono font-bold text-slate-700">${c.livingUnits} × 18.000 BTU (${Math.round(c.livingBTU).toLocaleString("es-UY")} BTU req.)</span></div>
                     </div>
                     <div class="border-t border-slate-100 pt-3 flex flex-col gap-1.5">
+                        <div class="flex justify-between text-xs"><span class="text-slate-500">Potencia total estimada</span><span class="font-mono font-bold text-slate-700">${c.potenciaKW.toFixed(1)} kW</span></div>
+                        <div class="flex justify-between text-xs items-center ${c.necesitaTrifasica ? 'bg-amber-50 -mx-1 px-2 py-1.5 rounded-lg' : ''}">
+                            <span class="${c.necesitaTrifasica ? 'text-amber-700 font-bold' : 'text-slate-500'}">Conexión UTE recomendada</span>
+                            <span class="font-mono font-extrabold ${c.necesitaTrifasica ? 'text-amber-700' : 'text-slate-700'}">${c.necesitaTrifasica ? 'Trifásica' : 'Monofásica'}</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3 flex flex-col gap-1.5">
                         <div class="flex justify-between text-xs"><span class="text-slate-500">Consumo estimado (calef. + refrig.)</span><span class="font-mono font-bold text-slate-700">${Math.round(c.kwhYear).toLocaleString("es-UY")} kWh/año</span></div>
                         <div class="flex justify-between text-xs"><span class="text-slate-500">Costo estimado en la boleta</span><span class="font-mono font-bold text-slate-700">$ ${Math.round(c.costUYU).toLocaleString("es-UY")} / año</span></div>
                         <div class="flex justify-between text-sm bg-emerald-50 -mx-1 px-2 py-1.5 rounded-lg mt-1">
@@ -693,7 +709,7 @@ const PLANOS_B64 = {
                             <span class="font-mono font-extrabold text-emerald-700">$ ${Math.round(c.savingsUYU).toLocaleString("es-UY")} / año</span>
                         </div>
                     </div>
-                    <p class="text-[9px] text-slate-400 leading-snug">Estimación a grosso modo: dormitorios con equipo split estándar fijo; living escalado según techo y aberturas elegidos. Consumo con tarifa UTE Residencial Simple (tramo 101-600 kWh, enero 2026) y equipos inverter con COP/EER promedio 3,0. No reemplaza un proyecto de climatización ni un cálculo de demanda energética formal.</p>
+                    <p class="text-[9px] text-slate-400 leading-snug">Estimación a grosso modo: dormitorios con equipo split estándar fijo; living escalado según techo y aberturas elegidos. Consumo con tarifa UTE Residencial Simple (tramo 101-600 kWh, enero 2026) y equipos inverter con COP/EER promedio 3,0. Potencia: 1,5 kW cada 12.000 BTU (tabla oficial UTE) + carga fija estimada de bomba sumergible, presurizadora, termotanque, horno, lavarropas/secarropas, heladera e iluminación — a confirmar con el electricista instalador. UTE permite monofásico hasta 11,5 kW; por encima corresponde trifásico. No reemplaza un proyecto de climatización ni eléctrico formal.</p>
                 `;
             }
             const modal = document.getElementById("clima-modal");
