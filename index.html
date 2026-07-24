@@ -593,7 +593,7 @@ const PLANOS_B64 = {
                 state.sist === "trad" ? (SC * 1400 + 45000) : (SC * 55 * TC + 30000), // 5. Cubierta
                 (["pino","lapacho"].includes(state.intR) ? 0 : SI * 2 * 550) + A * 550 + 45000, // 6. Drywall (Paredes en yeso SOLO si látex; Cielorraso y fijo siempre)
                 (A * PPISO[state.piso]) + (BANOS_C * 2200 * 23), // 7. Pisos (35 vs 60 USD)
-                (state.prop === 'p1' ? 17000 : state.prop === 'p2' ? 9500 : 23000) * TC * (state.abert === 'dvh' ? 1.38 : 1), // 8. Aberturas (P1/P2 auditadas; P3 ESTIMADA por escala desde P1 — 87,6 USD/m² × 262 m² — confirmar con planilla de carpintería A01-A05 de P3)
+                (state.prop === 'p1' ? 17000 * TC * (state.abert === 'dvh' ? 1.38 : 1) : state.prop === 'p2' ? 9500 * TC * (state.abert === 'dvh' ? 1.38 : 1) : 38276.83 * TC), // 8. Aberturas (P1/P2 auditadas; P3 AUDITADA — cotización real Eurowindows PVC CORTIZO, presupuesto 197/2 oscilobatiente, IVA incluido, USD 38.276,83 — reemplaza estimación anterior. Ya incluye vidrio DVH bajo emisivo/argón, no aplica factor DVH adicional)
                 75000 + (BANOS_C * 68000) + 34000 + ((P.LAVADERO || 0) * 45000), // 9. Sanitaria (+ lavadero con instalación propia solo en P3 — USD ~1.085 estimado, confirmar con Ricardo)
                 110000 + (A * 1500), // 10. Eléctrica (Escalable)
                 (["pino","lapacho"].includes(state.intR) ? (SI * 2 + A) * (state.intR === 'lapacho' ? 70 : 40) * TC : (A * 13.90 * TC)) + (SE * (state.fachada === 'lapacho' ? 24.08 : 13.76) * TC), // 11. Pintura/Lambris MATERIALES (Interior Pino: USD 40/m² | Lapacho: +75%=USD 70/m² | Exterior Pino: USD 13.76/m² | Lapacho +75%=USD 24.08/m²)
