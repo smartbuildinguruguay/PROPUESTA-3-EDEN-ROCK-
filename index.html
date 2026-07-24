@@ -230,6 +230,7 @@
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Aberturas</label>
                     <select id="mob-sel-abert" onchange="setAberturas(this.value)" class="w-full text-sm font-semibold border border-slate-200 py-3.5 px-3 rounded-xl bg-slate-50 cursor-pointer min-h-[48px]">
+                        <option value="gala">Aluminio Gala Negro DVH — USD 31.740</option>
                         <option value="oscilobatiente" selected>PVC Cortizo Oscilobatiente — USD 38.277</option>
                         <option value="corredera">PVC Cortizo Corrediza — USD 40.710</option>
                     </select>
@@ -318,6 +319,7 @@
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Aberturas</label>
                         <select id="sel-abert" onchange="setAberturas(this.value)" class="w-full text-sm font-semibold border border-slate-200 py-3.5 px-3 rounded-xl bg-slate-50 cursor-pointer min-h-[48px]">
+                            <option value="gala">Aluminio Gala Negro DVH — USD 31.740</option>
                             <option value="oscilobatiente" selected>PVC Cortizo Oscilobatiente — USD 38.277</option>
                             <option value="corredera">PVC Cortizo Corrediza — USD 40.710</option>
                         </select>
@@ -525,8 +527,8 @@ const PLANOS_B64 = {
                 "Impermeabilización de pisos de baños con pintura epóxica antes del revestimiento.",
             ],
             8: [
-                "Carpintería PVC europeo CORTIZO, vidrio DVH bajo emisivo/argón, según planilla A01–A05 (Eurowindows).",
-                "Herraje alemán ROTO FRANK, burletes y sellado perimetral con silicona SOUDAL neutra.",
+                "Carpintería según opción seleccionada: Aluminio Gala negro DVH (estimado) o PVC CORTIZO negro exterior/blanco interior DVH — oscilobatiente o corrediza (cotización real Eurowindows), planilla A01–A05.",
+                "Herraje alemán ROTO FRANK (PVC) o herrajes línea Gala (aluminio), burletes y sellado perimetral con silicona neutra.",
                 "Corredera tricarril de 6m en living (A05) y fijo panorámico de 2,15m (A01).",
                 "Puertas de acceso principal y trasera con cerradura de seguridad de tres puntos.",
                 "Puertas interiores de madera hueca con marcos de pino y bisagras incluidas.",
@@ -593,7 +595,7 @@ const PLANOS_B64 = {
                 state.sist === "trad" ? (SC * 1400 + 45000) : (SC * 55 * TC + 30000), // 5. Cubierta
                 (["pino","lapacho"].includes(state.intR) ? 0 : SI * 2 * 550) + A * 550 + 45000, // 6. Drywall (Paredes en yeso SOLO si látex; Cielorraso y fijo siempre)
                 (A * PPISO[state.piso]) + (BANOS_C * 2200 * 23), // 7. Pisos (35 vs 60 USD)
-                (state.prop === 'p1' ? 17000 * TC * (state.abert === 'dvh' ? 1.38 : 1) : state.prop === 'p2' ? 9500 * TC * (state.abert === 'dvh' ? 1.38 : 1) : (state.abert === 'corredera' ? 40709.84 : 38276.83) * TC), // 8. Aberturas P3 AUDITADA — cotizaciones reales Eurowindows PVC CORTIZO (planilla A01-A05, IVA incluido): Corrediza (presup. 197/1) USD 40.709,84 | Oscilobatiente (presup. 197/2) USD 38.276,83, seleccionable por el usuario. Ambas incluyen vidrio DVH bajo emisivo/argón
+                (state.prop === 'p1' ? 17000 * TC * (state.abert === 'dvh' ? 1.38 : 1) : state.prop === 'p2' ? 9500 * TC * (state.abert === 'dvh' ? 1.38 : 1) : (state.abert === 'corredera' ? 40709.84 : state.abert === 'gala' ? 31740 : 38276.83) * TC), // 8. Aberturas P3: 3 opciones — Gala aluminio negro DVH USD 31.740 (estimado, sin cotización formal) | PVC CORTIZO Oscilobatiente USD 38.276,83 (real, presup. Eurowindows 197/2, IVA incl.) | PVC CORTIZO Corrediza USD 40.709,84 (real, presup. Eurowindows 197/1, IVA incl.) — planilla A01-A05, todas con vidrio DVH
                 75000 + (BANOS_C * 68000) + 34000 + ((P.LAVADERO || 0) * 45000), // 9. Sanitaria (+ lavadero con instalación propia solo en P3 — USD ~1.085 estimado, confirmar con Ricardo)
                 110000 + (A * 1500), // 10. Eléctrica (Escalable)
                 (["pino","lapacho"].includes(state.intR) ? (SI * 2 + A) * (state.intR === 'lapacho' ? 70 : 40) * TC : (A * 13.90 * TC)) + (SE * (state.fachada === 'lapacho' ? 24.08 : 13.76) * TC), // 11. Pintura/Lambris MATERIALES (Interior Pino: USD 40/m² | Lapacho: +75%=USD 70/m² | Exterior Pino: USD 13.76/m² | Lapacho +75%=USD 24.08/m²)
