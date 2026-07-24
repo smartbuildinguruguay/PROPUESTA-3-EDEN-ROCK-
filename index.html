@@ -124,7 +124,7 @@
                     <p id="mob-sub-details" class="text-[9px] text-white/60 font-semibold uppercase tracking-wider leading-none mb-0.5"></p>
                     <div id="mob-badge-planta" class="text-[9px] text-white/50 font-mono"></div>
                     <div class="flex items-center gap-1.5 mt-1">
-                        <span id="mob-eff-term-label" class="text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white whitespace-nowrap"></span>
+                        <span id="mob-eff-term-label" class="text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white whitespace-nowrap">⚡ Eficiencia energética</span>
                         <div class="w-10 bg-white/20 rounded-full h-1.5 overflow-hidden" title="Eficiencia térmica estimada (grosso modo)">
                             <div id="mob-eff-term-bar" class="bar-transition h-full rounded-full"></div>
                         </div>
@@ -179,7 +179,7 @@
                     <span class="text-xs text-white/50">USD / m²</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span id="eff-term-label" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white whitespace-nowrap"></span>
+                    <span id="eff-term-label" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white whitespace-nowrap">⚡ Eficiencia energética</span>
                     <div class="w-14 bg-white/20 rounded-full h-1.5 overflow-hidden" title="Eficiencia térmica estimada (grosso modo)">
                         <div id="eff-term-bar" class="bar-transition h-full rounded-full"></div>
                     </div>
@@ -630,13 +630,12 @@ const PLANOS_B64 = {
             const g = Math.round(amber[1] + (green[1] - amber[1]) * t);
             const b = Math.round(amber[2] + (green[2] - amber[2]) * t);
             const color = `rgb(${r},${g},${b})`;
-            const label = scoreR >= 66 ? "Eficiente" : scoreR >= 33 ? "Intermedia" : "Mejorable";
             const tooltip = "Eficiencia térmica estimada (grosso modo) — H ≈ " + hR + " W/K";
             [["eff-term-bar", "eff-term-label"], ["mob-eff-term-bar", "mob-eff-term-label"]].forEach(([barId, labId]) => {
                 const bar = document.getElementById(barId);
                 const lab = document.getElementById(labId);
                 if (bar) { bar.style.width = scoreR + "%"; bar.style.backgroundColor = color; if (bar.parentElement) bar.parentElement.title = tooltip; }
-                if (lab) { lab.textContent = label; lab.style.backgroundColor = color; lab.title = tooltip; }
+                if (lab) { lab.style.backgroundColor = color; lab.title = tooltip; }
             });
         }
 
