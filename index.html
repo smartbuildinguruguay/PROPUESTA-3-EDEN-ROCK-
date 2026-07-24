@@ -123,6 +123,12 @@
                 <div class="flex flex-col">
                     <p id="mob-sub-details" class="text-[9px] text-white/60 font-semibold uppercase tracking-wider leading-none mb-0.5"></p>
                     <div id="mob-badge-planta" class="text-[9px] text-white/50 font-mono"></div>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <span id="mob-eff-term-label" class="text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white whitespace-nowrap"></span>
+                        <div class="w-10 bg-white/20 rounded-full h-1.5 overflow-hidden" title="Eficiencia térmica estimada (grosso modo)">
+                            <div id="mob-eff-term-bar" class="bar-transition h-full rounded-full"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-baseline gap-2">
                     <div id="mob-cost" class="text-white text-2xl font-extrabold leading-none tracking-tight">USD 0</div>
@@ -171,6 +177,12 @@
                 <div class="flex items-center gap-1 font-mono">
                     <span id="cost-per-m2-final" class="text-base font-bold text-white">0</span>
                     <span class="text-xs text-white/50">USD / m²</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span id="eff-term-label" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white whitespace-nowrap"></span>
+                    <div class="w-14 bg-white/20 rounded-full h-1.5 overflow-hidden" title="Eficiencia térmica estimada (grosso modo)">
+                        <div id="eff-term-bar" class="bar-transition h-full rounded-full"></div>
+                    </div>
                 </div>
                 <div id="badge-planta" class="bg-white/10 text-white text-[9px] px-2 py-0.5 rounded-md font-semibold font-mono"></div>
             </div>
@@ -262,23 +274,6 @@
                 </div>
             </div>
 
-            <!-- MOBILE: eficiencia térmica estimada -->
-            <div class="lg:hidden col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-3 flex flex-col gap-2 no-print">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">🌡️ Eficiencia térmica estimada</span>
-                    <span id="mob-eff-term-label" class="text-[9px] font-bold px-2 py-0.5 rounded-full text-white"></span>
-                </div>
-                <div class="w-full bg-neutral-100 rounded-full h-2.5 overflow-hidden">
-                    <div id="mob-eff-term-bar" class="bar-transition h-full rounded-full"></div>
-                </div>
-                <div class="flex justify-between text-[9px] text-slate-400">
-                    <span>Más eficiente</span>
-                    <span id="mob-eff-term-value" class="font-mono font-bold text-slate-500"></span>
-                    <span>Menos eficiente</span>
-                </div>
-                <p class="text-[9px] text-slate-400 leading-snug">Estimación a grosso modo (techo + muros + aberturas + ventilación por infiltración) según lo seleccionado arriba. No reemplaza un cálculo de demanda energética formal.</p>
-            </div>
-
             <!-- COL 1 DESKTOP: 3D & PLANOS -->
             <section id="col-3d-desktop" class="hidden lg:flex lg:col-span-3 flex-col gap-4 no-print">
                 <div class="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
@@ -366,22 +361,6 @@
                             <i data-lucide="file-text" class="w-3 h-3"></i> Ver estudio técnico completo (PDF)
                         </a>
                     </div>
-                </div>
-
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-3 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">🌡️ Eficiencia térmica estimada</span>
-                        <span id="eff-term-label" class="text-[9px] font-bold px-2 py-0.5 rounded-full text-white"></span>
-                    </div>
-                    <div class="w-full bg-neutral-100 rounded-full h-2.5 overflow-hidden">
-                        <div id="eff-term-bar" class="bar-transition h-full rounded-full"></div>
-                    </div>
-                    <div class="flex justify-between text-[9px] text-slate-400">
-                        <span>Más eficiente</span>
-                        <span id="eff-term-value" class="font-mono font-bold text-slate-500"></span>
-                        <span>Menos eficiente</span>
-                    </div>
-                    <p class="text-[9px] text-slate-400 leading-snug">Estimación a grosso modo (techo + muros + aberturas + ventilación por infiltración) según lo seleccionado arriba. No reemplaza un cálculo de demanda energética formal.</p>
                 </div>
             </section>
 
@@ -652,13 +631,12 @@ const PLANOS_B64 = {
             const b = Math.round(amber[2] + (green[2] - amber[2]) * t);
             const color = `rgb(${r},${g},${b})`;
             const label = scoreR >= 66 ? "Eficiente" : scoreR >= 33 ? "Intermedia" : "Mejorable";
-            [["eff-term-bar", "eff-term-label", "eff-term-value"], ["mob-eff-term-bar", "mob-eff-term-label", "mob-eff-term-value"]].forEach(([barId, labId, valId]) => {
+            const tooltip = "Eficiencia térmica estimada (grosso modo) — H ≈ " + hR + " W/K";
+            [["eff-term-bar", "eff-term-label"], ["mob-eff-term-bar", "mob-eff-term-label"]].forEach(([barId, labId]) => {
                 const bar = document.getElementById(barId);
                 const lab = document.getElementById(labId);
-                const val = document.getElementById(valId);
-                if (bar) { bar.style.width = scoreR + "%"; bar.style.backgroundColor = color; }
-                if (lab) { lab.textContent = label; lab.style.backgroundColor = color; }
-                if (val) val.textContent = "H ≈ " + hR + " W/K";
+                if (bar) { bar.style.width = scoreR + "%"; bar.style.backgroundColor = color; if (bar.parentElement) bar.parentElement.title = tooltip; }
+                if (lab) { lab.textContent = label; lab.style.backgroundColor = color; lab.title = tooltip; }
             });
         }
 
